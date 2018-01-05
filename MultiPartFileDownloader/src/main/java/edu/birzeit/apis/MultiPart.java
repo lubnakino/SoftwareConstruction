@@ -1,16 +1,21 @@
 package edu.birzeit.apis;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.birzeit.apis.files.FileConstructor;
+import edu.birzeit.exceptions.InvalidInputException;
 import edu.birzeit.exceptions.InvalidManifestURLException;
 import edu.birzeit.exceptions.ManiFestParserException;
 import edu.birzeit.exceptions.ManifestReaderException;
 import edu.birzeit.exceptions.UnreachableURLException;
 import edu.birzeit.parsers.ManifestParser;
 import edu.birzeit.parsers.ManifestReader;
+import edu.birzeit.structures.Segment;
 import edu.birzeit.validators.URLValidator;
 
 /**
@@ -28,8 +33,19 @@ public final class MultiPart {
 
     private URLValidator urlValidator;
 
+    private FileConstructor fileConstructor;
+
     private MultiPart() {
         urlValidator = new URLValidator();
+        fileConstructor = new FileConstructor();
+    }
+
+    public FileConstructor getFileConstructor() {
+        return fileConstructor;
+    }
+
+    public void setFileConstructor(FileConstructor fileConstructor) {
+        this.fileConstructor = fileConstructor;
     }
 
     // Get the only object available
@@ -58,9 +74,11 @@ public final class MultiPart {
      * @throws UnreachableURLException
      * @throws ManifestReaderException
      * @throws ManiFestParserException
+     * @throws InvalidInputException
+     * @throws IOException
      */
     public static InputStream openStream(String url) throws InvalidManifestURLException, ManifestReaderException,
-            UnreachableURLException, ManiFestParserException {
+            UnreachableURLException, ManiFestParserException, IOException, InvalidInputException {
         LOG.info("Open Stream was called with the following URL {}", url);
         if (_instance.getUrlValidator().isManifestURLValid(url) == false) {
             throw new InvalidManifestURLException("Invalid Manifest URL Exception");
@@ -73,9 +91,10 @@ public final class MultiPart {
 
         // 2. parse content
         ManifestParser manifestParser = new ManifestParser();
-        manifestParser.parseManifestURLContent(urlContent);
+        Map<String, Segment> segmentsMap = manifestParser.parseManifestURLContent(urlContent);
 
-        InputStream inputtStream = null;
+        // 3. read contents
+        InputStream inputtStream = _instance.getFileConstructor().fetchURLsAndGatherStream(segmentsMap);
 
         return inputtStream;
 
