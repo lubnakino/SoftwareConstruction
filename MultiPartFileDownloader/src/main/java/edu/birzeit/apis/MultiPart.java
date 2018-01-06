@@ -32,7 +32,7 @@ public final class MultiPart {
     private static MultiPart _instance = new MultiPart();
 
     private URLValidator urlValidator;
-
+     
     private FileConstructor fileConstructor;
 
     private MultiPart() {
