@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +34,9 @@ public class FileConstructor {
     public InputStream fetchURLsAndGatherStream(Map<String, Segment> segmentsMap)
             throws UnreachableURLException, IOException, InvalidInputException {
         String fileName = FILE_NAME_PREFIX + Math.random();
-        BufferedWriter writer = new BufferedWriter(new FileWriter("fileName", true));
-
+        String fileType = getFileType(segmentsMap.values().iterator().next());
+        fileName += fileType;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
         for (Segment segments : segmentsMap.values()) {
             BufferedReader bufferReader = URLUtils.getUrlContentAsBufferReader(segments.getMainUrl());
             if (bufferReader != null) {
@@ -55,12 +57,25 @@ public class FileConstructor {
             } else {
                 throw new UnreachableURLException("Segments URL is not reachable and has no mirrors!");
             }
-            String partialContent = InputOutputUtils.writeBufferedReaderToString(bufferReader);
+            ArrayList<Integer> partialContent = InputOutputUtils.writeBufferedReaderToBytes(bufferReader);
             LOG.info("URL Content is {} ", partialContent);
-            writer.append(partialContent);
+            for (Integer integer : partialContent) {
+                writer.append((char) integer.intValue());
+            }
         }
 
         writer.close();
         return new FileInputStream(fileName);
+    }
+
+    private String getFileType(Segment segment) {
+        String urlParts[] = segment.getMainUrl().split("-segment.*");
+        LOG.debug("Count of tokens {} ", urlParts.length);
+        String url = urlParts[0];
+        LOG.debug("url is {} ", url);
+        String fileType = url.substring(url.lastIndexOf('.'));
+        LOG.debug("fileType is {} ", fileType);
+        return fileType;
+
     }
 }
