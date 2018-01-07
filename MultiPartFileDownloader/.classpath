@@ -6,10 +6,10 @@
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/Users/AhdRadwan/SoftwareConstruction/MultiPartFileDownloader/src/main/resources/jars/commons-validator-1.6.jar"/>
-	<classpathentry kind="lib" path="/Users/AhdRadwan/SoftwareConstruction/MultiPartFileDownloader/src/main/resources/jars/logback-classic-1.2.3.jar"/>
-	<classpathentry kind="lib" path="/Users/AhdRadwan/SoftwareConstruction/MultiPartFileDownloader/src/main/resources/jars/logback-core-1.2.3.jar"/>
-	<classpathentry kind="lib" path="/Users/AhdRadwan/SoftwareConstruction/MultiPartFileDownloader/src/main/resources/jars/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="src/main/resources/jars/commons-validator-1.6.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/jars/logback-classic-1.2.3.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/jars/logback-core-1.2.3.jar"/>
+	<classpathentry kind="lib" path="src/main/resources/jars/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
