@@ -42,6 +42,7 @@ public class ManifestParser {
     public Map<String, Segment> parseManifestURLContent(String content) throws ManiFestParserException {
         LOG.debug("Parse Manifest URL Content was called with following Content {}", content);
         if (StringUtils.isBlank(content)) {
+   
             LOG.warn("Blank Content was provided ");
             throw new ManiFestParserException("Blank Content was provided");
         }

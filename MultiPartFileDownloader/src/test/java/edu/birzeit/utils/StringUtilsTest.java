@@ -22,7 +22,7 @@ public class StringUtilsTest {
 	@Test
 	public void testIsEmptyWithNonEmptyString() {
 		boolean result = StringUtils.isEmpty("This is a string");
-		Assert.assertFalse("Provided non empty string and  result should be false", false);
+		Assert.assertFalse("Provided non empty string and  result should be false", result);
 	}
 
 
