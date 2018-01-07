@@ -1,7 +1,12 @@
 package edu.birzeit.apis;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -16,6 +21,7 @@ import edu.birzeit.exceptions.UnreachableURLException;
 import edu.birzeit.parsers.ManifestParser;
 import edu.birzeit.parsers.ManifestReader;
 import edu.birzeit.structures.Segment;
+import edu.birzeit.utils.InputOutputUtils;
 import edu.birzeit.validators.URLValidator;
 
 /**
@@ -27,12 +33,14 @@ import edu.birzeit.validators.URLValidator;
  */
 public final class MultiPart {
 
+    private static final String FILE_NAME_PREFIX = "SCP-";
+
     private static final Logger LOG = LoggerFactory.getLogger(MultiPart.class);
 
     private static MultiPart _instance = new MultiPart();
 
     private URLValidator urlValidator;
-     
+
     private FileConstructor fileConstructor;
 
     private MultiPart() {
@@ -79,6 +87,25 @@ public final class MultiPart {
      */
     public static InputStream openStream(String url) throws InvalidManifestURLException, ManifestReaderException,
             UnreachableURLException, ManiFestParserException, IOException, InvalidInputException {
+
+        String fileName = FILE_NAME_PREFIX + Math.random() + ".raw";
+        // +
+        // URLUtils.getFileTypeFromURL(segmentsMap.values().iterator().next().getMainUrl());
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+        InputStream inputStream = new FileInputStream(fileName);
+
+        LOG.debug("File Name generated is {}", fileName);
+        _openStream(writer, url, fileName);
+        writer.close();
+        return inputStream;
+
+    }
+
+    private static void _openStream(BufferedWriter writer, String url, String fileName)
+            throws InvalidManifestURLException, ManifestReaderException, UnreachableURLException,
+            ManiFestParserException, IOException, InvalidInputException {
+
         LOG.info("Open Stream was called with the following URL {}", url);
         if (_instance.getUrlValidator().isManifestURLValid(url) == false) {
             throw new InvalidManifestURLException("Invalid Manifest URL Exception");
@@ -94,10 +121,19 @@ public final class MultiPart {
         Map<String, Segment> segmentsMap = manifestParser.parseManifestURLContent(urlContent);
 
         // 3. read contents
-        InputStream inputtStream = _instance.getFileConstructor().fetchURLsAndGatherStream(segmentsMap);
-
-        return inputtStream;
-
+        for (Segment segment : segmentsMap.values()) {
+            if (_instance.getUrlValidator().isManifestURLValid(segment.getMainUrl()) == true) {
+                _openStream(writer, url, fileName);
+            } else {
+                BufferedReader bufferReader = _instance.getFileConstructor().fetchURLsAndGatherStream(segment);
+                ArrayList<Integer> partialContent = InputOutputUtils.writeBufferedReaderToBytes(bufferReader);
+                LOG.debug("URL {} partial Content is {} ", segment.getMainUrl(), partialContent);
+                for (Integer integer : partialContent) {
+                    writer.append((char) integer.intValue());
+                }
+                writer.flush();
+            }
+        }
     }
 
 }

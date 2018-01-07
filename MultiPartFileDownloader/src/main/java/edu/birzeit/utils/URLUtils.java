@@ -75,4 +75,22 @@ public class URLUtils {
 
         return bufferedReader;
     }
+
+    /**
+     * This function will get the file type out of the URL segment
+     * 
+     * @param urlFromSegments
+     *            http://machine1.birzeit.edu/picture.png-segment1
+     * @return file-type .png for example
+     */
+    public static String getFileTypeFromURL(String urlFromSegments) {
+        String urlParts[] = urlFromSegments.split("-segment.*");
+        LOG.debug("Count of tokens {} ", urlParts.length);
+        String url = urlParts[0];
+        LOG.debug("url is {} ", url);
+        String fileType = url.substring(url.lastIndexOf('.'));
+        LOG.debug("fileType is {} ", fileType);
+        return fileType;
+
+    }
 }
