@@ -54,7 +54,6 @@ public class FileConstructorTest {
 			Map<String, Segment> segmentsMap = manifestParser.parseManifestURLContent(urlContent);
 			Segment segement = (Segment)segmentsMap.values().toArray()[0];
 			BufferedReader bufferedReader = fileConstructor.fetchURLsAndGatherStream(segement);
-			System.out.println("bufferedReaderbufferedReaderbufferedReader" + segement);
 			Assert.assertNotNull("Provide a valid segmentsMap and expect a not null inputStream", bufferedReader);
 
 		} catch (UnreachableURLException | IOException | InvalidInputException e) {
@@ -90,7 +89,7 @@ public class FileConstructorTest {
 
 	/**
 	 * Test method for {@link edu.birzeit.apis.files.FileConstructor#fetchURLsAndGatherStream(Segment)}.
-	 *  With valid segments and expect to success.
+	 *  With valid segments and expect to Pass.
 	 */
 	@Test
 	public void testFetchURLsAndGatherStreamWithManualyAddedSegments() {
@@ -104,7 +103,6 @@ public class FileConstructorTest {
 			segment1.setUrlMirrors(list1);
 
 			BufferedReader inptStream = fileConstructor.fetchURLsAndGatherStream(segment1);
-			System.out.println(inptStream.toString());
 			Assert.assertNotNull("Provide a valid segmentsMap and expect a not null inputStream", inptStream);
 
 		} catch (UnreachableURLException | IOException | InvalidInputException e) {
