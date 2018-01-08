@@ -4,10 +4,7 @@
 package edu.birzeit.parsers;
 
 import static org.junit.Assert.*;
-
-import org.junit.Assert;
 import org.junit.Test;
-
 import edu.birzeit.exceptions.ManifestReaderException;
 import edu.birzeit.exceptions.UnreachableURLException;
 
@@ -19,6 +16,7 @@ import edu.birzeit.exceptions.UnreachableURLException;
 public class ManifestReaderTest {
 	String validInputURL = "https://raw.githubusercontent.com/HadiAwad/SoftwareConstruction/master/TestingURLs/test-urls1.segments";
 	ManifestReader reader = new ManifestReader(validInputURL);
+
 	
 	/**
 	 * Test method for {@link edu.birzeit.parsers.ManifestReader#readManifestFile(java.lang.String)}.
@@ -37,6 +35,7 @@ public class ManifestReaderTest {
 		}
 	}
 	
+	
 	/**
 	 * Test method for {@link edu.birzeit.parsers.ManifestReader#readManifestFile(java.lang.String)}.
 	 * Test with invalid URL.
@@ -47,8 +46,7 @@ public class ManifestReaderTest {
 	@Test(expected = UnreachableURLException.class)
 	public void testReadManifestFileWithInvalidURL() throws ManifestReaderException, UnreachableURLException {
 			String content = reader.readManifestFile("https://this/is/invalid/url");
-			assertNotNull("Teset Pass, succsfully read a valid file",content);
+			System.out.println("File content = "+content);
 	}
-
 
 }
