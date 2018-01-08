@@ -16,7 +16,7 @@ public class MultipartRunner {
 
     public static void main(String[] args) {
 
-        String inputURL = "https://raw.githubusercontent.com/HadiAwad/SoftwareConstruction/master/TestingURLs/test-urls-single.segments";
+        String inputURL = "https://raw.githubusercontent.com/HadiAwad/SoftwareConstruction/master/TestingURLs/test-urls-jpg%20image.segments";
         LOG.info("inputURL {}", inputURL);
         try {
             MultiPart.openStream(inputURL);
