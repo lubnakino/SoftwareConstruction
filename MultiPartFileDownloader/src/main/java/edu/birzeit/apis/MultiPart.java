@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -88,7 +87,7 @@ public final class MultiPart {
     public static InputStream openStream(String url) throws InvalidManifestURLException, ManifestReaderException,
             UnreachableURLException, ManiFestParserException, IOException, InvalidInputException {
 
-        String fileName = FILE_NAME_PREFIX + Math.random() + ".raw";
+        String fileName = FILE_NAME_PREFIX + Math.random() + ".png";
         // +
         // URLUtils.getFileTypeFromURL(segmentsMap.values().iterator().next().getMainUrl());
 
@@ -126,11 +125,7 @@ public final class MultiPart {
                 _openStream(writer, url, fileName);
             } else {
                 BufferedReader bufferReader = _instance.getFileConstructor().fetchURLsAndGatherStream(segment);
-                ArrayList<Integer> partialContent = InputOutputUtils.writeBufferedReaderToBytes(bufferReader);
-                LOG.debug("URL {} partial Content is {} ", segment.getMainUrl(), partialContent);
-                for (Integer integer : partialContent) {
-                    writer.append((char) integer.intValue());
-                }
+                boolean readWriteResult = InputOutputUtils.writeBufferedReaderToBytes(bufferReader, writer);
                 writer.flush();
             }
         }
