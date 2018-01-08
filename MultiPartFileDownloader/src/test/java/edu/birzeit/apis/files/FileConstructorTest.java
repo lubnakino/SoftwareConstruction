@@ -38,24 +38,24 @@ import edu.birzeit.structures.Segment;
 public class FileConstructorTest {
 	FileConstructor fileConstructor = new FileConstructor();;
 	/**
-	 * Test method for {@link edu.birzeit.apis.files.FileConstructor#fetchURLsAndGatherStream(java.util.Map)}.
+	 * Test method for {@link edu.birzeit.apis.files.FileConstructor#fetchURLsAndGatherStream(Segment)}.
 	 */
 	@Test
 	public void testFetchURLsAndGatherStream() {
 
 		try {
 			//             1.read content
-			String validURL = "https://gist.githubusercontent.com/HadiAwad/0b8b94585261b1b8c04fdc5a80569c46/raw/f2bff7bfbfb31a1378131faaa69b6002e5991752/test.txt.segments";
+			String validURL = "https://raw.githubusercontent.com/HadiAwad/SoftwareConstruction/master/TestingURLs/test-urls1.segments";
 			ManifestReader manifestReader = new ManifestReader(validURL);
 			String urlContent = manifestReader.readManifestFile(validURL);
 
 			// 2. parse content
 			ManifestParser manifestParser = new ManifestParser();
 			Map<String, Segment> segmentsMap = manifestParser.parseManifestURLContent(urlContent);
-
-			InputStream inptStream = fileConstructor.fetchURLsAndGatherStream(segmentsMap);
-			System.out.println(inptStream.toString());
-			Assert.assertNotNull("Provide a valid segmentsMap and expect a not null inputStream", inptStream);
+			Segment segement = (Segment)segmentsMap.values().toArray()[0];
+			BufferedReader bufferedReader = fileConstructor.fetchURLsAndGatherStream(segement);
+			System.out.println("bufferedReaderbufferedReaderbufferedReader" + segement);
+			Assert.assertNotNull("Provide a valid segmentsMap and expect a not null inputStream", bufferedReader);
 
 		} catch (UnreachableURLException | IOException | InvalidInputException e) {
 			e.printStackTrace();
@@ -69,27 +69,41 @@ public class FileConstructorTest {
 			e.printStackTrace();
 		}}
 
+
+	/**
+	 * Test method for {@link edu.birzeit.apis.files.FileConstructor#fetchURLsAndGatherStream(Segment)}.
+	 *  With invalid segments URLs and expected  UnreachableURLException exception
+	 */
+	@Test (expected = UnreachableURLException.class)
+	public void testFetchURLsAndGatherStreamWithManualyAddedInvalidSegments() throws UnreachableURLException, IOException, InvalidInputException {
+
+		Segment segment1 = new Segment();
+		LinkedList<String>list1 = new LinkedList<>();
+		list1.add("http://machine2.birzeit.edu/picture.jpg-segment1");
+		segment1.setMainUrl("http://machine1.birzeit.edu/picture.jpg-segment1");
+		segment1.setUrlMirrors(list1);
+
+		BufferedReader bufferedReader = fileConstructor.fetchURLsAndGatherStream(segment1);
+		Assert.assertNotNull("Provide am valid segmentsMap and expect a not null inputStream", bufferedReader);
+
+	}
+
+	/**
+	 * Test method for {@link edu.birzeit.apis.files.FileConstructor#fetchURLsAndGatherStream(Segment)}.
+	 *  With valid segments and expect to success.
+	 */
 	@Test
 	public void testFetchURLsAndGatherStreamWithManualyAddedSegments() {
-		Map<String, Segment> segmentsMap = new HashMap<String, Segment>();
 
 		try {
 
 			Segment segment1 = new Segment();
 			LinkedList<String>list1 = new LinkedList<>();
-			list1.add("http://machine2.birzeit.edu/picture.jpg-segment1");
-			segment1.setMainUrl("http://machine1.birzeit.edu/picture.jpg-segment1");
+			list1.add("http://machine1.birzeit.edu/picture.png-segment3");
+			segment1.setMainUrl("https://github.com/HadiAwad/SoftwareConstruction/blob/master/TestingURLs/full-Image.png-segment3?raw=true");
 			segment1.setUrlMirrors(list1);
 
-			Segment segment2 = new Segment();
-			LinkedList<String>list2 = new LinkedList<>();
-			list1.add("http://machine1.birzeit.edu/picture.jpg-segment2");
-			segment2.setMainUrl("http://machine2.birzeit.edu/picture.jpg-segment2");
-			segment2.setUrlMirrors(list2);
-			segmentsMap.put("segment-1", segment1);
-			segmentsMap.put("segment-2", segment2);
-
-			InputStream inptStream = fileConstructor.fetchURLsAndGatherStream(segmentsMap);
+			BufferedReader inptStream = fileConstructor.fetchURLsAndGatherStream(segment1);
 			System.out.println(inptStream.toString());
 			Assert.assertNotNull("Provide a valid segmentsMap and expect a not null inputStream", inptStream);
 
@@ -99,4 +113,5 @@ public class FileConstructorTest {
 
 		}
 	}
+
 }
