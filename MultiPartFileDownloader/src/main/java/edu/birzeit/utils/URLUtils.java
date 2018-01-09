@@ -2,6 +2,7 @@ package edu.birzeit.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -40,7 +41,7 @@ public class URLUtils {
             return contentType;
         } catch (IOException e) {
             e.printStackTrace();
-            LOG.error(" IO Exception was thrown while trying to get the url content type", e);
+            LOG.error(" IO Exception was thrown while trying to get the url content type", e.getMessage());
         } finally {
             LOG.debug("trying to close the connection if it was opened!");
             if (connection != null) {
@@ -67,13 +68,32 @@ public class URLUtils {
             bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            LOG.error(" Malformed URL  Exception was thrown while trying to get the url content as buffer reader", e);
+            LOG.error(" Malformed URL  Exception was thrown while trying to get the url content as buffer reader",
+                    e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
-            LOG.error(" IO Exception was thrown while trying to get the url content as buffer reader", e);
+            LOG.error(" IO Exception was thrown while trying to get the url content as buffer reader", e.getMessage());
         }
 
         return bufferedReader;
+    }
+
+    public static InputStream getUrlContentAsInputStream(String urlString) {
+        HttpURLConnection connection = null;
+        URL urlObject;
+        InputStream inputStream = null;
+        try {
+            urlObject = new URL(urlString);
+            connection = (HttpURLConnection) urlObject.openConnection();
+            inputStream = connection.getInputStream();
+        } catch (MalformedURLException e) {
+            LOG.error(" Malformed URL  Exception was thrown while trying to get the url content as buffer reader",
+                    e.getMessage());
+        } catch (IOException e) {
+            LOG.error(" IO Exception was thrown while trying to get the url content as buffer reader", e.getMessage());
+        }
+
+        return inputStream;
     }
 
     /**

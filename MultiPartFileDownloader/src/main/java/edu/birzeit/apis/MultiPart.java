@@ -1,11 +1,11 @@
 package edu.birzeit.apis;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import edu.birzeit.apis.files.FileConstructor;
 import edu.birzeit.exceptions.InvalidInputException;
 import edu.birzeit.exceptions.InvalidManifestURLException;
+import edu.birzeit.exceptions.InvalidSegmentURLException;
 import edu.birzeit.exceptions.ManiFestParserException;
 import edu.birzeit.exceptions.ManifestReaderException;
 import edu.birzeit.exceptions.UnreachableURLException;
@@ -32,8 +33,7 @@ import edu.birzeit.validators.URLValidator;
  */
 public final class MultiPart {
 
-    private static final String FILE_NAME_PREFIX = "SCP-";
-
+    private static int MAX_ALLOWED_RECURSIVE_CALL = 20;
     private static final Logger LOG = LoggerFactory.getLogger(MultiPart.class);
 
     private static MultiPart _instance = new MultiPart();
@@ -41,6 +41,8 @@ public final class MultiPart {
     private URLValidator urlValidator;
 
     private FileConstructor fileConstructor;
+
+    private int counter = 0;
 
     private MultiPart() {
         urlValidator = new URLValidator();
@@ -68,6 +70,14 @@ public final class MultiPart {
         this.urlValidator = urlValidator;
     }
 
+    public void resetCounter() {
+        counter = 0;
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
     /**
      * The main API of the application so far. As being described, this will be
      * handling the URLs and check whether they point to manifest files or not
@@ -83,27 +93,33 @@ public final class MultiPart {
      * @throws ManiFestParserException
      * @throws InvalidInputException
      * @throws IOException
+     * @throws InvalidSegmentURLException
      */
-    public static InputStream openStream(String url) throws InvalidManifestURLException, ManifestReaderException,
-            UnreachableURLException, ManiFestParserException, IOException, InvalidInputException {
+    public static InputStream openStream(String url)
+            throws InvalidManifestURLException, ManifestReaderException, UnreachableURLException,
+            ManiFestParserException, IOException, InvalidInputException, InvalidSegmentURLException {
+        _instance.resetCounter();
+        ArrayList<ByteArrayOutputStream> resultBuffers = new ArrayList<ByteArrayOutputStream>();
+        _openStream(resultBuffers, url);
 
-        String fileName = FILE_NAME_PREFIX + Math.random() + ".png";
-        // +
-        // URLUtils.getFileTypeFromURL(segmentsMap.values().iterator().next().getMainUrl());
+        int size = 0;
+        for (ByteArrayOutputStream byteArrayOutputStream : resultBuffers) {
+            size += byteArrayOutputStream.size();
+        }
+        ByteBuffer buffredFile = ByteBuffer.allocate(size);
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
-        InputStream inputStream = new FileInputStream(fileName);
+        for (ByteArrayOutputStream byteArrayOutputStream : resultBuffers) {
+            buffredFile.put(byteArrayOutputStream.toByteArray());
+        }
 
-        LOG.debug("File Name generated is {}", fileName);
-        _openStream(writer, url, fileName);
-        writer.close();
+        InputStream inputStream = new ByteArrayInputStream(buffredFile.array());
         return inputStream;
 
     }
 
-    private static void _openStream(BufferedWriter writer, String url, String fileName)
+    private static void _openStream(ArrayList<ByteArrayOutputStream> resultBuffers, String url)
             throws InvalidManifestURLException, ManifestReaderException, UnreachableURLException,
-            ManiFestParserException, IOException, InvalidInputException {
+            ManiFestParserException, IOException, InvalidInputException, InvalidSegmentURLException {
 
         LOG.info("Open Stream was called with the following URL {}", url);
         if (_instance.getUrlValidator().isManifestURLValid(url) == false) {
@@ -122,13 +138,17 @@ public final class MultiPart {
         // 3. read contents
         for (Segment segment : segmentsMap.values()) {
             if (_instance.getUrlValidator().isManifestURLValid(segment.getMainUrl()) == true) {
-                _openStream(writer, url, fileName);
+                if (_instance.getCounter() == MAX_ALLOWED_RECURSIVE_CALL) {
+                    return;
+                }
+                _openStream(resultBuffers, url);
             } else {
-                BufferedReader bufferReader = _instance.getFileConstructor().fetchURLsAndGatherStream(segment);
-                boolean readWriteResult = InputOutputUtils.writeBufferedReaderToBytes(bufferReader, writer);
-                writer.flush();
+                InputStream _stream = _instance.getFileConstructor().fetchURLsAndGatherStream(segment);
+                ByteArrayOutputStream readBytes = InputOutputUtils.writeBufferedReaderToBytes(_stream);
+                resultBuffers.add(readBytes);
             }
         }
+        return;
     }
 
 }

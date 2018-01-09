@@ -1,7 +1,7 @@
 package edu.birzeit.apis.files;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -22,20 +22,20 @@ public class FileConstructor {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileConstructor.class);
 
-    public BufferedReader fetchURLsAndGatherStream(Segment segment)
+    public InputStream fetchURLsAndGatherStream(Segment segment)
             throws UnreachableURLException, IOException, InvalidInputException {
 
-        BufferedReader bufferReader = URLUtils.getUrlContentAsBufferReader(segment.getMainUrl());
-        if (bufferReader != null) {
+        InputStream InputStream = URLUtils.getUrlContentAsInputStream(segment.getMainUrl());
+        if (InputStream != null) {
             LOG.info("Main URL {} is  reachable and content was fetched", segment.getMainUrl());
-            return bufferReader;
+            return InputStream;
         } else if (!segment.getUrlMirrors().isEmpty()) {
             List<String> urlMirrors = segment.getUrlMirrors();
             for (String urlMirror : urlMirrors) {
-                bufferReader = URLUtils.getUrlContentAsBufferReader(urlMirror);
-                if (bufferReader != null) {
+                InputStream = URLUtils.getUrlContentAsInputStream(urlMirror);
+                if (InputStream != null) {
                     LOG.info("Mirror URL {} is  reachable and content was fetched", urlMirror);
-                    return bufferReader;
+                    return InputStream;
                 }
             }
             throw new UnreachableURLException("Segments URL and all of its mirrors are not reachable!");

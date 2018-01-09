@@ -6,19 +6,24 @@ import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.birzeit.apis.MultiPart;
 import edu.birzeit.exceptions.InvalidInputException;
 import edu.birzeit.exceptions.InvalidManifestURLException;
+import edu.birzeit.exceptions.InvalidSegmentURLException;
 import edu.birzeit.exceptions.ManiFestParserException;
 import edu.birzeit.exceptions.ManifestReaderException;
 import edu.birzeit.exceptions.UnreachableURLException;
 
 public class MultiPartTest {
+    private static final Logger LOG = LoggerFactory.getLogger(MultiPartTest.class);
 
     @Test(expected = InvalidManifestURLException.class)
-    public void testUnreachanleOpenStream() throws InvalidManifestURLException, ManifestReaderException,
-            UnreachableURLException, ManiFestParserException, InvalidInputException, IOException {
+    public void testUnreachanleOpenStream()
+            throws InvalidManifestURLException, ManifestReaderException, UnreachableURLException,
+            ManiFestParserException, InvalidInputException, IOException, InvalidSegmentURLException {
         String url = "http://host.bzu.edu/unreachable/manifestSample";
         MultiPart.openStream(url);
     }
@@ -26,11 +31,12 @@ public class MultiPartTest {
     @Test
     public void testReachableOpenStream() {
 
-        String url = "https://gist.githubusercontent.com/HadiAwad/0b8b94585261b1b8c04fdc5a80569c46/raw/f2bff7bfbfb31a1378131faaa69b6002e5991752/test.txt.segments";
+        String url = "https://raw.githubusercontent.com/HadiAwad/SoftwareConstruction/master/TestingURLs/test-urls.txt.segments";
         InputStream inptStream = null;
         try {
             inptStream = MultiPart.openStream(url);
         } catch (Exception e) {
+            LOG.error("Error", e);
             Assert.assertTrue("Exception has been thrown while trying to open stream!", false);
         }
 

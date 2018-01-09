@@ -55,8 +55,12 @@ public class URLValidator {
      */
     public boolean isManifestURLValid(String manifestURL) {
         log.debug("isManifestURLValid started for the following URL {}.", manifestURL);
+        if (!manifestURL.endsWith(MANIFEST_URL_SUFFIX)) {
+            log.error("manifest URL is does not end with suffix {}.", MANIFEST_URL_SUFFIX);
+            return false;
+        }
         if (validteURL(manifestURL) == false) {
-            log.warn("manifest URL is not a valid URL {}.", manifestURL);
+            log.error("manifest URL is not a valid URL {}.", manifestURL);
             return false;
         }
 
@@ -65,7 +69,7 @@ public class URLValidator {
             log.debug("manifest URL is  a valid Manifest URL {}.", manifestURL);
             return true;
         }
-        log.warn("validation failed for the URL {}.", manifestURL);
+        log.error("validation failed for the URL {}", manifestURL);
         return false;
     }
 }

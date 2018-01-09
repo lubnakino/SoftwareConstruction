@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import edu.birzeit.exceptions.InvalidInputException;
 import edu.birzeit.exceptions.InvalidManifestURLException;
+import edu.birzeit.exceptions.InvalidSegmentURLException;
 import edu.birzeit.exceptions.ManiFestParserException;
 import edu.birzeit.exceptions.ManifestReaderException;
 import edu.birzeit.exceptions.UnreachableURLException;
@@ -16,7 +17,7 @@ public class MultipartRunner {
 
     public static void main(String[] args) {
 
-        String inputURL = "https://raw.githubusercontent.com/HadiAwad/SoftwareConstruction/master/TestingURLs/test-urls-jpg%20image.segments";
+        String inputURL = "https://github.com/HadiAwad/SoftwareConstruction/blob/master/TestingURLs/test-urls.txt.segments";
         LOG.info("inputURL {}", inputURL);
         try {
             MultiPart.openStream(inputURL);
@@ -36,6 +37,9 @@ public class MultipartRunner {
             e.printStackTrace();
             LOG.error("IO Exception was thrown for the following URL {}", inputURL, e);
         } catch (InvalidInputException e) {
+            e.printStackTrace();
+            LOG.error("Invalid Input Exception was thrown for the following URL {}", inputURL, e);
+        } catch (InvalidSegmentURLException e) {
             e.printStackTrace();
             LOG.error("Invalid Input Exception was thrown for the following URL {}", inputURL, e);
         }

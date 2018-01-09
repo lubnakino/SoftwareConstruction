@@ -1,8 +1,9 @@
 package edu.birzeit.utils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,28 +38,30 @@ public class InputOutputUtils {
         }
     }
 
-    public static boolean writeBufferedReaderToBytes(BufferedReader bufferReader, BufferedWriter writer)
+    public static ByteArrayOutputStream writeBufferedReaderToBytes(InputStream stream)
             throws IOException, InvalidInputException {
 
-        if (bufferReader == null) {
+        if (stream == null) {
             LOG.error("bufferReader was null! cannot read URL");
             throw new InvalidInputException("bufferReader was null! cannot read URL");
         }
 
         try {
-            char[] buffer = new char[4096];
+            byte[] buffer = new byte[8192];
             int length;
-            while ((length = bufferReader.read(buffer)) != -1) {
+            ByteArrayOutputStream writer = new ByteArrayOutputStream();
+            while ((length = stream.read(buffer)) != -1) {
                 LOG.debug("buffer, {} ", buffer);
                 writer.write(buffer, 0, length);
             }
-            return true;
+            LOG.debug("length is, {} ", writer.size());
+            return writer;
         } catch (IOException e) {
             e.printStackTrace();
             LOG.error("Exception was thrown while reading the content of buffered reader");
             throw e;
         } finally {
-            bufferReader.close();
+            stream.close();
         }
     }
 }
