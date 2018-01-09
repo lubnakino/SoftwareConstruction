@@ -78,6 +78,10 @@ public final class MultiPart {
         return counter;
     }
 
+    public void incrementCounter() {
+        counter++;
+    }
+
     /**
      * The main API of the application so far. As being described, this will be
      * handling the URLs and check whether they point to manifest files or not
@@ -120,11 +124,12 @@ public final class MultiPart {
     private static void _openStream(ArrayList<ByteArrayOutputStream> resultBuffers, String url)
             throws InvalidManifestURLException, ManifestReaderException, UnreachableURLException,
             ManiFestParserException, IOException, InvalidInputException, InvalidSegmentURLException {
-
         LOG.info("Open Stream was called with the following URL {}", url);
         if (_instance.getUrlValidator().isManifestURLValid(url) == false) {
             throw new InvalidManifestURLException("Invalid Manifest URL Exception");
         }
+
+        _instance.incrementCounter();
 
         // 1.read content
         LOG.debug("Validation Passed for the following URL {}", url);
